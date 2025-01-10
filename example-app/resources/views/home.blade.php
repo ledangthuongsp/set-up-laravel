@@ -29,7 +29,7 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td>
-                                <a href="{{ route('user.edit', $user) }}" class="btn btn-primary">Edit</a>
+                                <a href="{{ route('user.update', $user) }}" class="btn btn-primary">Edit</a>
                                 <form action="{{ route('user.destroy', $user) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')

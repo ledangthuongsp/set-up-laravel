@@ -35,7 +35,7 @@
             </div>
             
             <div class="form-group">
-                <a href="{{ route('user.edit', $user->id) }}" class="btn btn-primary">Chỉnh sửa</a>
+                <a href="{{ route('user.update', $user->id) }}" class="btn btn-primary">Chỉnh sửa</a>
                 <form action="{{ route('user.destroy', $user->id) }}" method="POST" style="display:inline;">
                     @csrf
                     @method('DELETE')

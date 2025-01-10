@@ -43,29 +43,27 @@ class UserController extends Controller
         return view('user.show', compact('user')); // Trả về view chi tiết người dùng
     }
 
-    // Hiển thị form chỉnh sửa người dùng
-    public function edit($id)
-    {
-        $user = User::findOrFail($id); // Lấy người dùng theo ID
-        return view('user.edit_user', compact('user')); // Trả về view chỉnh sửa người dùng
-    }
-
     // Cập nhật thông tin người dùng
     public function update(UserRequest $request, $id)
     {
-        $validatedData = $request->validated(); // Xác thực dữ liệu theo UserRequest
-
-        // Lấy người dùng theo ID
-        $user = User::findOrFail($id);
-        $user->update([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            // Nếu có mật khẩu mới, cập nhật mật khẩu
-            'password' => $request->password ? Hash::make($validatedData['password']) : $user->password,
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8|confirmed', // Chỉ yêu cầu mật khẩu nếu người dùng thay đổi
         ]);
 
-        return redirect()->route('user.show', $user->id); // Chuyển hướng đến trang chi tiết người dùng
+        $user = User::findOrFail($id); // Tìm người dùng theo ID
+        
+        // Nếu người dùng cung cấp mật khẩu mới, mã hóa nó, nếu không giữ nguyên mật khẩu cũ
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password ? Hash::make($request->password) : $user->password,
+        ]);
+
+        return redirect()->route('user.show', $user->id); // Chuyển hướng về trang chi tiết người dùng sau khi cập nhật thành công
     }
+
 
     // Xóa người dùng
     public function destroy($id)
