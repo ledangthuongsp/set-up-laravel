@@ -1,21 +1,15 @@
 <?php
-
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
+use PharIo\Manifest\Email;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
+
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
-
     /**
      * Define the model's default state.
      *
@@ -24,11 +18,11 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'name' => fake()->name(), // Đảm bảo name không null
+            'email' => fake()->unique()->safeEmail(), // Đảm bảo email không trùng
+            'email_verified_at' => now(), // Email đã được xác nhận
+            'password' => Hash::make('password'), // Đảm bảo password có độ bảo mật cao
+            'remember_token' => Str::random(10), // Tạo token ngẫu nhiên cho nhớ người dùng
         ];
     }
 
@@ -38,7 +32,7 @@ class UserFactory extends Factory
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+            'email_verified_at' => null, // Đặt email chưa xác nhận
         ]);
     }
 }

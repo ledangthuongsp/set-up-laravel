@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -34,7 +34,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -42,7 +42,51 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Perform validation for user registration.
+     *
+     * @param array $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public static function validate(array $data)
+    {
+        return Validator::make($data, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'], // Validate email and ensure it's unique
+            'password' => [
+                'required',
+                'min:8',  // Password must be at least 8 characters
+                'regex:/[A-Za-z]/',  // Password must contain at least one letter
+                'regex:/[0-9]/',  // Password must contain at least one number
+                'regex:/[@$!%*?&]/',  // Password must contain at least one special character
+                'regex:/[A-Z]/',  // Password must contain at least one uppercase letter
+            ],
+        ]);
+    }
+
+    /**
+     * Set the user's password while hashing it.
+     *
+     * @param string $password
+     * @return void
+     */
+    public function setPasswordAttribute($password)
+    {
+        // Hash the password before saving
+        $this->attributes['password'] = Hash::make($password);
+    }
+
+    /**
+     * Check if the provided password matches the user's password.
+     *
+     * @param string $password
+     * @return bool
+     */
+    public function checkPassword($password)
+    {
+        return Hash::check($password, $this->password);
     }
 }
